@@ -1,0 +1,57 @@
+# Verified against herdr 0.9.5 — see https://herdr.dev/docs/plugins/
+id = "dima.icons"
+name = "Icons"
+version = "0.1.0"
+min_herdr_version = "0.9.5"
+description = "Animated pixel status icons for agents in the sidebar"
+platforms = ["macos", "linux"]
+
+[[build]]
+command = ["npm", "ci"]
+
+[[build]]
+command = ["npm", "run", "build"]
+
+# The animator: polls agent states and pushes icon frames as pane/workspace
+# metadata tokens. It keeps running while herdr does and exits on its own once
+# the socket has been gone for 30s. A second copy for the same socket exits at once.
+[[startup]]
+command = ["node", "dist/cli/daemon.js"]
+
+[[panes]]
+id = "preview"
+title = "Icon preview"
+placement = "popup"
+width = 56
+height = 18
+command = ["node", "dist/cli/preview.js"]
+
+[[actions]]
+id = "preview"
+title = "Icons: preview and pick a set"
+contexts = ["workspace"]
+command = ["node", "dist/cli/control.js", "preview"]
+
+[[actions]]
+id = "setup-sidebar"
+title = "Icons: add the animated icons to the sidebar rows"
+contexts = ["workspace"]
+command = ["node", "dist/cli/setup.js"]
+
+[[actions]]
+id = "remove-sidebar"
+title = "Icons: restore the default sidebar rows"
+contexts = ["workspace"]
+command = ["node", "dist/cli/setup.js", "--remove"]
+
+[[actions]]
+id = "restart"
+title = "Icons: restart the animator"
+contexts = ["workspace"]
+command = ["node", "dist/cli/control.js", "restart"]
+
+[[actions]]
+id = "stop"
+title = "Icons: stop the animator"
+contexts = ["workspace"]
+command = ["node", "dist/cli/control.js", "stop"]
