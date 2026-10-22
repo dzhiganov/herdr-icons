@@ -20,6 +20,22 @@ export type IconSet = Record<AgentState, Animation>;
 const anim = (fps: number, grids: Grid[]): Animation => ({ fps, frames: grids.map(toBraille) });
 const repeat = <T>(n: number, x: T): T[] => Array.from({ length: n }, () => x);
 
+// ── minimal: one familiar symbol per state ─────────────────────────────────────
+
+/**
+ * U+2800 (blank braille) instead of a space for "off" frames: herdr trims token
+ * text, and an empty token would drop its separator and shift the row.
+ */
+const OFF = '\u2800';
+
+const minimal: IconSet = {
+  working: { fps: 10, frames: ['⠋', '⠙', '⠹', '⠸', '⠼', '⠴', '⠦', '⠧', '⠇', '⠏'] }, // spinner: busy
+  blocked: { fps: 2, frames: ['!', '!', '!', OFF] }, // needs your input
+  done: { fps: 0, frames: ['✓'] }, // finished, not looked at yet
+  idle: { fps: 0, frames: ['○'] }, // waiting, nothing to do
+  unknown: { fps: 0, frames: ['·'] },
+};
+
 // ── classic: equalizer, blinking alert, check mark, breathing dot ──────────────
 
 /** Six bars whose heights follow phase-shifted sine waves. */
@@ -89,7 +105,7 @@ const face: IconSet = {
   unknown: anim(0, [SHUT]),
 };
 
-export const ICON_SETS = { classic, face } as const satisfies Record<string, IconSet>;
+export const ICON_SETS = { minimal, classic, face } as const satisfies Record<string, IconSet>;
 export type IconSetName = keyof typeof ICON_SETS;
 
 export function isIconSetName(s: unknown): s is IconSetName {

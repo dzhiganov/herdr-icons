@@ -16,7 +16,7 @@ export interface Config {
   maxRequestsPerSecond: number;
 }
 
-export const DEFAULT_CONFIG: Config = { set: 'classic', speed: 1, spaces: true, maxRequestsPerSecond: 60 };
+export const DEFAULT_CONFIG: Config = { set: 'minimal', speed: 1, spaces: true, maxRequestsPerSecond: 60 };
 
 /** Herdr injects these for plugin commands; the fallbacks match herdr's defaults. */
 export function configDir(): string {

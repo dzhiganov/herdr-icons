@@ -2,11 +2,11 @@ import { statSync } from 'node:fs';
 import { join } from 'node:path';
 import { Animator, type Observed } from './animator.js';
 import { loadConfig, configDir, stateDir, type Config } from './config.js';
-import { ApiError, ConnectionError, listAgents, listWorkspaces, reportTokens, type Request } from './herdr.js';
+import { ApiError, ConnectionError, listAgents, listWorkspaces, reportTokens, shownStatus, type Request } from './herdr.js';
 import { acquireLock, releaseLock } from './lock.js';
 import { ICON_SETS } from './sprites.js';
 
-const POLL_MS = 1_000;
+const POLL_MS = 500;
 const FAST_TICK_MS = 50;
 const IDLE_TICK_MS = 500;
 const CONFIG_CHECK_MS = 3_000;
@@ -126,8 +126,8 @@ export async function runDaemon(request: Request, socket: string): Promise<void>
             config.spaces ? listWorkspaces(request) : Promise.resolve([]),
           ]);
           observed = [
-            ...agents.map((a) => ({ target: { kind: 'pane' as const, id: a.pane_id }, status: a.agent_status })),
-            ...workspaces.map((w) => ({ target: { kind: 'workspace' as const, id: w.workspace_id }, status: w.agent_status })),
+            ...agents.map((a) => ({ target: { kind: 'pane' as const, id: a.pane_id }, status: shownStatus(a) })),
+            ...workspaces.map((w) => ({ target: { kind: 'workspace' as const, id: w.workspace_id }, status: shownStatus(w) })),
           ];
           if (unreachable) animator.reset(); // a restarted herdr starts without our tokens
           unreachable = false;

@@ -134,7 +134,7 @@ describe('parseConfig', () => {
   it('accepts valid fields and warns about bad ones', () => {
     expect(parseConfig({ set: 'face', speed: 2, spaces: false }).config).toMatchObject({ set: 'face', speed: 2, spaces: false });
     const bad = parseConfig({ set: 'nope', speed: -1, spaces: 'yes', maxRequestsPerSecond: 0 });
-    expect(bad.config).toMatchObject({ set: 'classic', speed: 1, spaces: true, maxRequestsPerSecond: 60 });
+    expect(bad.config).toMatchObject({ set: 'minimal', speed: 1, spaces: true, maxRequestsPerSecond: 60 });
     expect(bad.warnings).toHaveLength(4);
     expect(parseConfig([]).warnings).toHaveLength(1);
   });

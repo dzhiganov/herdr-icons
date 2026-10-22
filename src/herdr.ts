@@ -75,11 +75,21 @@ export interface AgentInfo {
   workspace_id: string;
   agent?: string;
   agent_status: string;
+  focused?: boolean;
 }
 
 export interface WorkspaceInfo {
   workspace_id: string;
   agent_status: string;
+  focused?: boolean;
+}
+
+/**
+ * The status herdr's sidebar shows: `done` means "idle and not seen yet", and the
+ * sidebar already draws the focused pane/space as idle (it is being looked at).
+ */
+export function shownStatus(item: { agent_status: string; focused?: boolean }): string {
+  return item.agent_status === 'done' && item.focused ? 'idle' : item.agent_status;
 }
 
 export async function listAgents(request: Request): Promise<AgentInfo[]> {

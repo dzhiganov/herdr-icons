@@ -1,22 +1,27 @@
 # Icons: animated agent status icons for herdr
 
-A [herdr](https://herdr.dev) plugin that replaces the static status dot in the sidebar with small animated pixel icons, one per agent state:
+A [herdr](https://herdr.dev) plugin that replaces the static status dot in the sidebar with small animated icons, one per agent state, and puts the state name next to each agent:
 
-| state | `classic` | `face` |
-|---|---|---|
-| working | equalizer bars `⣾⣧⣀` | eyes darting around `⠶⠀⠶` |
-| blocked | blinking `!` `⡇⣛⢸` | wide eyes ↔ `> <` `⣿⠀⣿` |
-| done | check mark that draws itself `⢄⡠⠊` | happy `^ ^` bobbing `⠊⠒⠑` |
-| idle | slow breathing dot `⠀⠶⠀` | blinking eyes `⠶⠀⠶` |
-| unknown | `⠤⠀⠤` | `⠤⠀⠤` |
+```
+⠹ · api          ! · web          ✓ · infra        ○ · docs
+  claude · working  codex · blocked  pi · done       claude · idle
+```
 
-Each icon is a 6×4 pixel grid drawn with braille characters (3 cells wide), colored per state. It shows in the Agents panel, and also in the Spaces panel for each space's rolled-up state.
+| state | `minimal` (default) | `classic` | `face` |
+|---|---|---|---|
+| working | spinner `⠋⠙⠹⠸…` | equalizer bars `⣾⣧⣀` | eyes darting `⠶⠀⠶` |
+| blocked (needs your input) | blinking `!` | blinking `!` `⡇⣛⢸` | wide eyes ↔ `> <` |
+| done (finished, not seen yet) | `✓` | check mark that draws itself `⢄⡠⠊` | happy `^ ^` |
+| idle | `○` | breathing dot `⠀⠶⠀` | blinking eyes |
+| unknown | `·` | `⠤⠀⠤` | `⠤⠀⠤` |
+
+`minimal` uses one familiar symbol per state. `classic` and `face` are 6×4 pixel animations drawn with braille characters (3 cells wide). Each state has its own color, and icons show in the Agents panel and, for each space's rolled-up state, in the Spaces panel.
 
 ## How it works
 
 herdr plugins can't draw in the sidebar directly, but sidebar rows can show custom `$name` tokens that scripts report as pane or workspace metadata. So:
 
-1. A small animator (the plugin's `[[startup]]` hook) polls `agent.list` / `workspace.list` every second and sends the current animation frame as a token: `$icon_working`, `$icon_blocked`, `$icon_done`, `$icon_idle` or `$icon_unknown`. Only the token for the current state has a value, so each state gets its own color in the config.
+1. A small animator (the plugin's `[[startup]]` hook) polls `agent.list` / `workspace.list` twice a second and sends the current animation frame as a token: `$icon_working`, `$icon_blocked`, `$icon_done`, `$icon_idle` or `$icon_unknown`. Only the token for the current state has a value, so each state gets its own color in the config.
 2. Your `config.toml` sidebar rows show those tokens where `state_icon` used to be.
 
 Details:
@@ -55,7 +60,7 @@ herdr plugin action invoke dima.icons.restart
 [ui.sidebar.agents]
 rows = [
   [{ token = "$icon_working", fg = "#f9e2af" }, { token = "$icon_blocked", fg = "#f38ba8" }, { token = "$icon_done", fg = "#a6e3a1" }, { token = "$icon_idle", fg = "#89b4fa" }, { token = "$icon_unknown", fg = "#6c7086" }, "machine", "workspace", "tab"],
-  ["agent"],
+  ["agent", "state_text"],
 ]
 
 [ui.sidebar.spaces]
@@ -66,7 +71,7 @@ rows = [
 # <<< herdr-icons
 ```
 
-These are herdr's default rows with `state_icon` swapped for the five icon tokens. Change the colors, or move the tokens anywhere in your rows.
+These are herdr's default rows with `state_icon` swapped for the five icon tokens, plus `state_text` (the state name) next to the agent. Change the colors, or move the tokens anywhere in your rows.
 
 If your config already has its own `[ui.sidebar.agents]` / `[ui.sidebar.spaces]` rows, setup leaves the file alone. It prints the block instead (`npm run setup-sidebar -- --print`), so you can swap `state_icon` yourself. Undo with `npm run setup-sidebar -- --remove` (or the `dima.icons.remove-sidebar` action).
 
@@ -100,7 +105,7 @@ description = "Icon preview"
 
 ```jsonc
 {
-  "set": "classic",            // "classic" or "face"
+  "set": "minimal",            // "minimal", "classic" or "face"
   "speed": 1,                  // animation speed multiplier; 0 = static icons
   "spaces": true,              // also animate spaces (Spaces panel)
   "maxRequestsPerSecond": 60   // frames are dropped above this

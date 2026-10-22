@@ -77,3 +77,12 @@ describe('lock', () => {
     expect(acquireLock('/b.sock', d)).toBeNull();
   });
 });
+
+describe('shownStatus', () => {
+  it('shows a focused done agent as idle, like the sidebar', async () => {
+    const { shownStatus } = await import('../src/herdr.js');
+    expect(shownStatus({ agent_status: 'done', focused: true })).toBe('idle');
+    expect(shownStatus({ agent_status: 'done', focused: false })).toBe('done');
+    expect(shownStatus({ agent_status: 'working', focused: true })).toBe('working');
+  });
+});

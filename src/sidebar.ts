@@ -24,7 +24,10 @@ function iconTokens(): string {
   return STATES.map((s) => `{ token = "$${tokenFor(s)}", fg = "${COLORS[s]}" }`).join(', ');
 }
 
-/** herdr's default rows (0.9.5) with `state_icon` swapped for the animated icons. */
+/**
+ * herdr's default rows (0.9.5) with `state_icon` swapped for the animated icons,
+ * plus the state name next to the agent (`claude · working`) as a legend.
+ */
 export function sidebarBlock(spaces: boolean): string {
   const icons = iconTokens();
   const lines = [
@@ -32,7 +35,7 @@ export function sidebarBlock(spaces: boolean): string {
     '[ui.sidebar.agents]',
     'rows = [',
     `  [${icons}, "machine", "workspace", "tab"],`,
-    '  ["agent"],',
+    '  ["agent", "state_text"],',
     ']',
   ];
   if (spaces) {
