@@ -38,7 +38,7 @@ Details:
 ## Install
 
 ```sh
-git clone <this repo> ~/projects/herdr-icons
+git clone https://github.com/dzhiganov/herdr-icons ~/projects/herdr-icons
 cd ~/projects/herdr-icons
 npm ci && npm run build
 herdr plugin link .
